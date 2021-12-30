@@ -75,10 +75,16 @@ h1,h2,h3,h4,h5,h6{
 
 .quantity{
 	display: inline-block;
-	font-weight: 700;
-	padding-right:10px;
-	
+	font-weight: 500;
+	padding-right: 10px;
+}
 
+.quantity-text{
+    display: inline-block;
+    position: relative;
+    bottom: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .chg-quantity{
@@ -87,6 +93,7 @@ h1,h2,h3,h4,h5,h6{
 	display: block;
 	margin-top: 5px;
 	transition:.1s;
+    padding-top: 3px;
 }
 
 .chg-quantity:hover{

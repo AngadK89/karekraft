@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import *
+from django.http import JsonResponse
 
 def querying_data(request):
     if request.user.is_authenticated:
@@ -28,3 +29,5 @@ def checkout(request):
     context = {'items': items, 'order': order}
     return render(request, 'store/checkout.html', context)
 
+def updateItem(request):
+    return JsonResponse('Item was added', safe=False)

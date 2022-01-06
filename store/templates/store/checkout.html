@@ -7,6 +7,7 @@
                 <h4>Checkout</h4>
                 <hr>
                 <form id="form">
+                    {% csrf_token %}
                     <div id="user-info">
                         <p>Customer Information:</p>
                         <hr>
@@ -80,6 +81,10 @@
 
 
     var form = document.getElementById('form')
+
+    csrftoken = form.getElementsByTagName("input")[0].value
+    console.log('Newtoken: ', csrftoken)
+
     form.addEventListener('submit', function(e){
         e.preventDefault()
         console.log('Form submitted.')
@@ -112,6 +117,24 @@
             userFormData.name = form.name.value
             userFormData.email = form.email.value
         }
+
+        var url = '/process_order/'
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', 
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({'form': userFormData, 'shipping': shippingInfo})
+        })
+        .then((response) => response.json())
+
+        .then((data) => {
+            console.log('Success: ', data);
+            alert('Transaction Completed!');
+            window.location.href = "{% url 'store' %}"
+        })
 
 
     }

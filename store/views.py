@@ -11,10 +11,19 @@ def querying_data(request):
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
     else:
-        #Create empty cart as of now for guest (non-logged in) users
+        try:
+            cart =  json.loads(request.COOKIES['cart']) #json.loads() makes it a python dictionary
+        except KeyError:
+            cart = {}
+        print("Cart: ", cart)
+
         items = []
         order = {'get_cart_total': 0, 'get_cart_items': 0}
         cartItems = order['get_cart_items']
+        
+        for i in cart:
+            cartItems += cart[i]['quantity']
+
     return items, order, cartItems
 
 

@@ -3,7 +3,7 @@ from .models import *
 from django.http import JsonResponse
 import datetime
 import json
-from .utils import querying_data
+from .utils import querying_data, guestOrder
 
 def store(request):
     cart_data = querying_data(request)
@@ -62,47 +62,22 @@ def processOrder(request):
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
 
     else:
-        print("User is not logged in.")
+        customer, order = guestOrder(request, data)
 
-        print("Cookies: ", request.COOKIES)
-        name = data['form']['name']
-        email = data['form']['email']
-
-        cart_data = querying_data(request)
-        items = cart_data['items']
-
-        customer, created = Customer.objects.get_or_create(email=email)
-        customer.name = name
-        customer.save()
-
-        order = Order.objects.create(
-            customer=customer,
-            complete=False,
-        )
-
-        for item in items:
-            product = Product.objects.get(id=item['product']['id'])
-
-            orderItem = OrderItem.objects.create(
-                product=product,
-                order=order,
-                quantity = item['quantity' ]
-            )
-
-    ShippingAddress.objects.create(
-        customer=customer,
-        order=order,
-        address=data['shipping']['address'],
-        city=data['shipping']['city'],
-        state=data['shipping']['state'],
-        zipcode=data['shipping']['zipcode'],
-    )
-    
     total = int(data['form']['total'])
     order.transaction_id = transaction_id
 
     if total == int(order.get_cart_total):
         order.complete = True
     order.save()
+
+    ShippingAddress.objects.create(
+    customer=customer,
+    order=order,
+    address=data['shipping']['address'],
+    city=data['shipping']['city'],
+    state=data['shipping']['state'],
+    zipcode=data['shipping']['zipcode'],
+    )
 
     return JsonResponse('Payment complete!', safe=False)

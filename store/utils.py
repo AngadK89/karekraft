@@ -43,4 +43,4 @@ def querying_data(request):
             except:
                 pass
 
-    return items, order, cartItems
+    return {'items': items, 'order': order, 'cartItems': cartItems}

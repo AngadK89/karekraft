@@ -17,6 +17,7 @@
 						<div class="form-field">
 							<input required class="form-control" type="email" name="email" placeholder="Email..">
 						</div>
+                        <hr>
                     </div>
 
                     <div id="shipping-info">
@@ -85,7 +86,7 @@
     csrftoken = form.getElementsByTagName("input")[0].value
     console.log('Newtoken: ', csrftoken)
 
-    form.addEventListener('submit', function(e){
+    form.addEventListener("submit", function(e){
         e.preventDefault()
         console.log('Form submitted.')
         document.getElementById('form-button').classList.add("hidden");
@@ -133,6 +134,10 @@
         .then((data) => {
             console.log('Success: ', data);
             alert('Transaction Completed!');
+
+            cart = {}
+            document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+
             window.location.href = "{% url 'store' %}"
         })
 

@@ -6,20 +6,23 @@ import json
 from .utils import querying_data
 
 def store(request):
-    items, order, cartItems = querying_data(request)
+    cart_data = querying_data(request)
+    cartItems = cart_data['cartItems']
     products = Product.objects.all()
     context = {'products': products, 'cartItems': cartItems}
     return render(request, 'store/store.html', context)
 
 
 def cart(request):
-    items, order, cartItems = querying_data(request)
+    cart_data = querying_data(request)
+    items, order, cartItems = cart_data['items'], cart_data['order'], cart_data['cartItems']
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'store/cart.html', context)
 
 
 def checkout(request):
-    items, order, cartItems = querying_data(request)
+    cart_data = querying_data(request)
+    items, order, cartItems = cart_data['items'], cart_data['order'], cart_data['cartItems']
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'store/checkout.html', context)
 
@@ -57,21 +60,49 @@ def processOrder(request):
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        total = int(data['form']['total'])
-        order.transaction_id = transaction_id
 
-        if total == int(order.get_cart_total):
-            order.complete = True
-        order.save()
-
-        ShippingAddress.objects.create(
-            customer=customer,
-            order=order,
-            address=data['shipping']['address'],
-            city=data['shipping']['city'],
-            state=data['shipping']['state'],
-            zipcode=data['shipping']['zipcode'],
-        )
     else:
         print("User is not logged in.")
+
+        print("Cookies: ", request.COOKIES)
+        name = data['form']['name']
+        email = data['form']['email']
+
+        cart_data = querying_data(request)
+        items = cart_data['items']
+
+        customer, created = Customer.objects.get_or_create(email=email)
+        customer.name = name
+        customer.save()
+
+        order = Order.objects.create(
+            customer=customer,
+            complete=False,
+        )
+
+        for item in items:
+            product = Product.objects.get(id=item['product']['id'])
+
+            orderItem = OrderItem.objects.create(
+                product=product,
+                order=order,
+                quantity = item['quantity' ]
+            )
+
+    ShippingAddress.objects.create(
+        customer=customer,
+        order=order,
+        address=data['shipping']['address'],
+        city=data['shipping']['city'],
+        state=data['shipping']['state'],
+        zipcode=data['shipping']['zipcode'],
+    )
+    
+    total = int(data['form']['total'])
+    order.transaction_id = transaction_id
+
+    if total == int(order.get_cart_total):
+        order.complete = True
+    order.save()
+
     return JsonResponse('Payment complete!', safe=False)

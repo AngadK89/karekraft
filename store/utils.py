@@ -20,9 +20,9 @@ def querying_data(request):
 
         for i in cart:
             try: 
+                product = Product.objects.get(id=i)
                 cartItems += cart[i]['quantity']
 
-                product = Product.objects.get(id=i)
                 total = (product.price * cart[i]['quantity'])
 
                 order['get_cart_total'] += total
@@ -37,7 +37,7 @@ def querying_data(request):
                 
             except:
                 pass
-
+            
     return {'items': items, 'order': order, 'cartItems': cartItems}
 
 

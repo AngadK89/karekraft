@@ -3,47 +3,7 @@ from .models import *
 from django.http import JsonResponse
 import datetime
 import json
-
-def querying_data(request):
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-    else:
-        try:
-            cart =  json.loads(request.COOKIES['cart']) #json.loads() makes it a python dictionary
-        except KeyError:
-            cart = {}
-        print("Cart: ", cart)
-
-        items = []
-        order = {'get_cart_total': 0, 'get_cart_items': 0}
-        cartItems = order['get_cart_items']
-
-        for i in cart:
-            cartItems += cart[i]['quantity']
-
-            product = Product.objects.get(id=i)
-            total = (product.price * cart[i]['quantity'])
-
-            order['get_cart_total'] += total
-            order['get_cart_items'] += cart[i]['quantity']
-
-            item = {
-                'product': {
-                    'id': product.id,
-                    'name': product.name,
-                    'price': product.price,
-                    'ImageURL': product.ImageURL,
-                },
-                'quantity': cart[i]['quantity'],
-                'get_total': total,
-            }
-            items.append(item)
-
-    return items, order, cartItems
-
+from .utils import querying_data
 
 def store(request):
     items, order, cartItems = querying_data(request)

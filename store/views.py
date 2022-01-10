@@ -30,6 +30,18 @@ def querying_data(request):
             order['get_cart_total'] += total
             order['get_cart_items'] += cart[i]['quantity']
 
+            item = {
+                'product': {
+                    'id': product.id,
+                    'name': product.name,
+                    'price': product.price,
+                    'ImageURL': product.ImageURL,
+                },
+                'quantity': cart[i]['quantity'],
+                'get_total': total,
+            }
+            items.append(item)
+
     return items, order, cartItems
 
 

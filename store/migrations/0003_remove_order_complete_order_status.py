@@ -6,17 +6,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('store', '0002_alter_customer_email'),
+        ("store", "0002_alter_customer_email"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='order',
-            name='complete',
+            model_name="order",
+            name="complete",
         ),
         migrations.AddField(
-            model_name='order',
-            name='status',
-            field=models.CharField(choices=[('Received', 'Received'), ('Dispatched', 'Dispatched'), ('Delivered', 'Delivered'), ('Returned Requested', 'Returned Requested'), ('Returned', 'Returned'), ('Cancelled', 'Cancelled')], default='Received', max_length=20, null=True),
+            model_name="order",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("Received", "Received"),
+                    ("Dispatched", "Dispatched"),
+                    ("Delivered", "Delivered"),
+                    ("Returned Requested", "Returned Requested"),
+                    ("Returned", "Returned"),
+                    ("Cancelled", "Cancelled"),
+                ],
+                default="Received",
+                max_length=20,
+                null=True,
+            ),
         ),
     ]

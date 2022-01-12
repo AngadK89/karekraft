@@ -73,6 +73,8 @@
         </div>
     </div>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script type="text/javascript">
     var total = '{{order.get_cart_total}}'
 
@@ -96,6 +98,7 @@
 
     document.getElementById('make-payment').addEventListener('click', function(e){
         submitFormData()
+        e.preventDefault();
     })
 
     function submitFormData(){
@@ -132,6 +135,28 @@
         .then((response) => response.json())
 
         .then((data) => {
+            var options = {
+                "key": "rzp_test_95n7g5IxLaQMGz",
+                "amount": (total * 100).toString(),
+                "currency": "INR",
+                "name": "KareKraft",
+                "description": "KareKraft Checkout",
+                "order_id": data["order_id"],
+                "handler": function (response) {
+                    alert(response.razorpay_payment_id);
+                    alert(response.razorpay_order_id);
+                    alert(response.razorpay_signature)
+                },
+            };
+
+            var rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function(response) {
+                alert(response.error);
+            });
+
+            rzp1.open();
+
+
             console.log('Success: ', data);
             alert('Transaction Completed!');
 

@@ -24,11 +24,14 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    fields = ["customer", "transaction_id", "date_ordered", "status"]
-    readonly_fields = ["customer", "transaction_id", "date_ordered",]
-    list_display = ["transaction_id", "date_ordered", "status"]
-    list_filter = ["status"]
-    ordering = ["date_ordered"]
+    fieldsets = [
+        ("Order Details", {'fields': ["customer", "transaction_id", "date_ordered", "status"]}),
+        ("Payment Details", {'fields': ['payment_method', 'paid']}),
+    ]
+    readonly_fields = ["customer", "transaction_id", "date_ordered", "payment_method"]
+    list_display = ["transaction_id", "date_ordered", "status", "paid"]
+    list_filter = ["status", "paid", "payment_method"]
+    ordering = ["-date_ordered"]
 
 
 class ShippingAddressAdmin(admin.ModelAdmin):

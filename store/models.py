@@ -64,6 +64,13 @@ class Order(models.Model):
     transaction_id = models.CharField(max_length=200, null=True)
     razorpay_order = models.JSONField(null=True)
 
+    METHODS = [
+        ("Razorpay", "Razorpay"),
+        ("COD", "COD"),
+    ]
+    payment_method = models.CharField(max_length=20, choices=METHODS, null=True, blank=False)
+    paid = models.BooleanField(default=False)
+
     def razorpayOrder(self, amount):
         client = razorpay.Client(
             auth=("rzp_test_95n7g5IxLaQMGz", "A3Qj0BehTIFJAgnoVquqQRee")

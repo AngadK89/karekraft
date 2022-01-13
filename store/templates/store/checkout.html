@@ -46,7 +46,8 @@
             <br>
             <div class="box-element hidden" id="payment-info">
                 <h4>Payment Options</h4>
-                <button id="make-payment">Make Payment</button> 
+                <button id="razorpay" >Razorpay</button> 
+                <button id="cod">Cash on Delivery</button> 
                 <hr>
             </div>
         </div>
@@ -96,12 +97,49 @@
     })
 
 
-    document.getElementById('make-payment').addEventListener('click', function(e){
-        submitFormData()
-        // e.preventDefault()
+    document.getElementById('razorpay').addEventListener('click', function(e){
+        var COD = false;
+        submitFormData(COD)
     })
 
-    function submitFormData(){
+    document.getElementById('cod').addEventListener('click', function(e){
+        var COD = true;
+        submitFormData(COD)
+    })
+
+
+    function postProcess(COD, payment_id=null, order_id=null, signature=null) {
+        var url = '/post_process/'
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', 
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({
+                'payment_id': payment_id, 
+                'order_id': order_id,
+                'signature': signature,
+                'COD': COD, 
+            })
+        })
+
+        .then((response) => {
+            return response.json();
+        })
+
+        .then((data) => {
+            document.cookie = 'cart=' + JSON.stringify({}) + ";domain=;path=/";
+            alert(data)
+            window.location.href = "{% url 'store' %}"
+        })
+
+
+    }
+
+
+    function submitFormData(COD){
         console.log("Payment button clicked.")
 
         var userFormData = {
@@ -130,12 +168,13 @@
                 'Content-type': 'application/json', 
                 'X-CSRFToken': csrftoken,
             },
-            body: JSON.stringify({'form': userFormData, 'shipping': shippingInfo})
+            body: JSON.stringify({'form': userFormData, 'shipping': shippingInfo, 'COD': COD})
         })
         .then((response) => response.json())
 
         .then((data) => {
-            var options = {
+            if (!COD) {
+                var options = {
                 "key": "rzp_test_95n7g5IxLaQMGz",
                 "amount": (total * 100).toString(),
                 "currency": "INR",
@@ -147,23 +186,9 @@
                     alert(response.razorpay_order_id);
                     alert(response.razorpay_signature);
 
-                    console.log('Success: ', data);
-                    var url = '/post_process/'
+                    postProcess(COD, response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
 
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-type': 'application/json', 
-                            'X-CSRFToken': csrftoken,
-                        },
-                        body: JSON.stringify({
-                            'payment_id': response.razorpay_payment_id, 
-                            'order_id': response.razorpay_order_id,
-                            'signature': response.razorpay_signature,
-                        })
-                    })
-                    
-                    .then(() => document.cookie = 'cart=' + JSON.stringify({}) + ";domain=;path=/")
+                    console.log('Success: ', data);
                 },
             };
 
@@ -172,7 +197,13 @@
                 alert(response.error.description);
             });
 
-            rzp1.open();            
+            rzp1.open();     
+            }
+            
+            else {
+                postProcess(COD);
+            }
+         
         })
     }
 </script>

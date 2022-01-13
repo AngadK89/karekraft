@@ -1,3 +1,5 @@
+from http.client import HTTPResponse
+from telnetlib import STATUS
 from django.shortcuts import render, redirect
 from .models import *
 from django.http import JsonResponse
@@ -87,20 +89,30 @@ def processOrder(request):
         zipcode=data["shipping"]["zipcode"],
     )
 
-    order.razorpayOrder(total*100)
-    
-    return JsonResponse({'razorpay_order': order.razorpay_order})
+    if not data['COD']:
+        order.razorpayOrder(total*100)
+        return JsonResponse({'razorpay_order': order.razorpay_order})
+    else:
+        return JsonResponse('', safe=False)
+
 
 
 def postProcess(request):
     data = json.loads(request.body)
-    order = Order.objects.get(razorpay_order__contains={'order_id': data['order_id']})
-    order.razorpay_order['payment_id'] = data['payment_id']
-    order.razorpay_order['signature'] = data['signature']
-    order.payment_method = 'Razorpay'
-    order.paid = True
+
+    if not data['COD']:
+        order = Order.objects.get(razorpay_order__contains={'order_id': data['order_id']})
+        order.razorpay_order['payment_id'] = data['payment_id']
+        order.razorpay_order['signature'] = data['signature']
+        order.payment_method = 'Razorpay'
+        order.paid = True
+    else:
+        order = Order.objects.get(customer=request.user.customer, complete=False)
+        order.payment_method = 'COD'
+        order.paid = False
+
     order.complete = True
     order.save()
 
-    redirect("store")
-    # return JsonResponse("Payment Verified!", safe=False)
+    #redirect('store')
+    return JsonResponse("Payment Completed!", safe=False)

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import *
 from django.http import JsonResponse
 import datetime
@@ -76,8 +76,6 @@ def processOrder(request):
     total = int(data["form"]["total"])
     order.transaction_id = transaction_id
 
-    if total == int(order.get_cart_total):
-        order.complete = True    
     order.save()
 
     ShippingAddress.objects.create(
@@ -91,4 +89,18 @@ def processOrder(request):
 
     order.razorpayOrder(total*100)
     
-    return JsonResponse(order.razorpay_order)
+    return JsonResponse({'razorpay_order': order.razorpay_order})
+
+
+def postProcess(request):
+    data = json.loads(request.body)
+    order = Order.objects.get(razorpay_order__contains={'order_id': data['order_id']})
+    order.razorpay_order['payment_id'] = data['payment_id']
+    order.razorpay_order['signature'] = data['signature']
+    order.payment_method = 'Razorpay'
+    order.paid = True
+    order.complete = True
+    order.save()
+
+    redirect("store")
+    # return JsonResponse("Payment Verified!", safe=False)

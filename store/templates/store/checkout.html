@@ -98,7 +98,7 @@
 
     document.getElementById('make-payment').addEventListener('click', function(e){
         submitFormData()
-        e.preventDefault();
+        // e.preventDefault()
     })
 
     function submitFormData(){
@@ -141,29 +141,38 @@
                 "currency": "INR",
                 "name": "KareKraft",
                 "description": "KareKraft Checkout",
-                "order_id": data["order_id"],
+                "order_id": data['razorpay_order']["order_id"],
                 "handler": function (response) {
                     alert(response.razorpay_payment_id);
                     alert(response.razorpay_order_id);
-                    alert(response.razorpay_signature)
+                    alert(response.razorpay_signature);
+
+                    console.log('Success: ', data);
+                    var url = '/post_process/'
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-type': 'application/json', 
+                            'X-CSRFToken': csrftoken,
+                        },
+                        body: JSON.stringify({
+                            'payment_id': response.razorpay_payment_id, 
+                            'order_id': response.razorpay_order_id,
+                            'signature': response.razorpay_signature,
+                        })
+                    })
+                    
+                    .then(() => document.cookie = 'cart=' + JSON.stringify({}) + ";domain=;path=/")
                 },
             };
 
             var rzp1 = new Razorpay(options);
             rzp1.on('payment.failed', function(response) {
-                alert(response.error);
+                alert(response.error.description);
             });
 
-            rzp1.open();
-
-
-            console.log('Success: ', data);
-            alert('Transaction Completed!');
-
-            cart = {}
-            document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
-
-            window.location.href = "{% url 'store' %}"
+            rzp1.open();            
         })
     }
 </script>

@@ -45,9 +45,8 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    customer = models.ForeignKey(
-        Customer, on_delete=models.SET_NULL, blank=True, null=True
-    )
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, blank=True, null=True)
+    products = models.ManyToManyField(Product, through="OrderItem")
     date_ordered = models.DateTimeField(auto_now_add=True)
     STATUS = [
         ("Received", "Received"),

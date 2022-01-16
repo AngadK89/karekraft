@@ -22,6 +22,29 @@ class ProductAdmin(admin.ModelAdmin):
         "name",
     ]
 
+class ProductInlineAdmin(admin.TabularInline):
+    model = Order.products.through
+    extra = 0
+    can_delete = False
+
+    def has_add_permission(self, request, obj):
+        return False
+    
+    def has_change_permission(self, request, obj):
+        return False
+
+
+class ShippingAddressInlineAdmin(admin.TabularInline):
+    model = ShippingAddress
+    extra = 0
+    can_delete = False
+
+    def has_add_permission(self, request, obj):
+        return False
+    
+    def has_change_permission(self, request, obj):
+        return False
+
 
 class OrderAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -29,9 +52,10 @@ class OrderAdmin(admin.ModelAdmin):
         ("Payment Details", {'fields': ['payment_method', 'paid']}),
     ]
     readonly_fields = ["customer", "transaction_id", "date_ordered", "payment_method"]
-    list_display = ["transaction_id", "date_ordered", "status", "paid"]
+    list_display = ["id", "date_ordered", "status", "paid"]
     list_filter = ["status", "paid", "payment_method"]
     ordering = ["-date_ordered"]
+    inlines = (ProductInlineAdmin, ShippingAddressInlineAdmin)
 
 
 class ShippingAddressAdmin(admin.ModelAdmin):
@@ -56,5 +80,5 @@ class ShippingAddressAdmin(admin.ModelAdmin):
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Order, OrderAdmin)
-admin.site.register(OrderItem)
-admin.site.register(ShippingAddress, ShippingAddressAdmin)
+# admin.site.register(OrderItem)
+# admin.site.register(ShippingAddress, ShippingAddressAdmin)

@@ -114,5 +114,4 @@ def postProcess(request):
     order.complete = True
     order.save()
 
-    #redirect('store')
     return JsonResponse("Payment Completed!", safe=False)

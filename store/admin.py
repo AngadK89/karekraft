@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import *
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 
 
 class CustomerAdmin(admin.ModelAdmin):
@@ -75,6 +77,20 @@ class ShippingAddressAdmin(admin.ModelAdmin):
     ]
     list_display = ["address", "customer", "date_added"]
     search_fields = ["address", "city", "state", "zipcode", "customer__name"]
+
+
+admin.site.unregister(User)
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    readonly_fields = [
+        'date_joined',
+        'username',
+        'first_name',
+        'last_name',
+        'email',
+        'last_login',
+    ]
 
 
 admin.site.register(Customer, CustomerAdmin)

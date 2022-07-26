@@ -1,11 +1,16 @@
 from http.client import HTTPResponse
 from telnetlib import STATUS
 from django.shortcuts import render, redirect
+from store.forms import SignUpForm
 from .models import *
 from django.http import JsonResponse
 import datetime
 import json
 from .utils import querying_data, guestOrder
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+from django.contrib.auth import login, authenticate
+from .forms import SignUpForm
 
 
 def store(request):
@@ -14,6 +19,27 @@ def store(request):
     products = Product.objects.all()
     context = {"products": products, "cartItems": cartItems}
     return render(request, "store/store.html", context)
+
+
+def register(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            email = form.cleaned_data.get('email')
+            user = authenticate(username=username, password=raw_password)
+            customer = Customer(user=user, name=username, email=email)
+            customer.save()
+            messages.success(request, f'Your account has been created!')
+            login(request, user)
+            return redirect("store")
+    
+    else:
+        form = SignUpForm()
+    context = {'form': form}
+    return render(request, 'store/register.html', context)
 
 
 def cart(request):

@@ -7,10 +7,11 @@ from django.http import JsonResponse
 import datetime
 import json
 from .utils import querying_data, guestOrder
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from .forms import SignUpForm
+from django.contrib import messages
 
 
 def store(request):
@@ -30,16 +31,42 @@ def register(request):
             raw_password = form.cleaned_data.get('password1')
             email = form.cleaned_data.get('email')
             user = authenticate(username=username, password=raw_password)
-            customer = Customer(user=user, name=username, email=email)
-            customer.save()
             messages.success(request, f'Your account has been created!')
             login(request, user)
+            customer = Customer(user=user, name=username, email=email)
+            customer.save()
             return redirect("store")
     
     else:
         form = SignUpForm()
     context = {'form': form}
     return render(request, 'store/register.html', context)
+
+
+def login_request(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=raw_password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'You have been logged in!')
+                return redirect("store")
+            else:
+                messages.error(request,"Invalid username or password.")
+        else:
+            messages.error(request,"Invalid username or password.")    
+    form = AuthenticationForm()
+    context = {'form': form}
+    return render(request, 'store/login.html', context)
+
+
+def logout_request(request):
+    logout(request)
+    messages.info(request, "You have successfully logged out.") 
+    return redirect("store")
 
 
 def cart(request):

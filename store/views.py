@@ -78,16 +78,16 @@ def processOrder(request):
     total = int(data["form"]["total"])
     order.transaction_id = transaction_id
 
-    order.save()
-
-    ShippingAddress.objects.create(
+    shipping_address = ShippingAddress(
         customer=customer,
-        order=order,
         address=data["shipping"]["address"],
         city=data["shipping"]["city"],
         state=data["shipping"]["state"],
         zipcode=data["shipping"]["zipcode"],
     )
+    shipping_address.save()
+    order.shipping_address = shipping_address
+    order.save()
 
     if not data['COD']:
         order.razorpayOrder(total*100)
@@ -114,4 +114,4 @@ def postProcess(request):
     order.complete = True
     order.save()
 
-    return JsonResponse("Payment Completed!", safe=False)
+    return JsonResponse("Your order has been placed!", safe=False)

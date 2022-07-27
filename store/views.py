@@ -65,7 +65,6 @@ def updateItem(request):
 
 
 def processOrder(request):
-    transaction_id = datetime.datetime.now().timestamp()
     data = json.loads(request.body)
 
     if request.user.is_authenticated:
@@ -76,7 +75,6 @@ def processOrder(request):
         customer, order = guestOrder(request, data)
 
     total = int(data["form"]["total"])
-    order.transaction_id = transaction_id
 
     shipping_address = ShippingAddress(
         customer=customer,

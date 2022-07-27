@@ -75,7 +75,6 @@ class Order(models.Model):
         max_length=20, choices=STATUS, default="Received", null=True, blank=False
     )
     complete = models.BooleanField(default=False)
-    transaction_id = models.CharField(max_length=200, null=True)
     razorpay_order = models.JSONField(null=True)
 
     METHODS = [

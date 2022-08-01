@@ -1,11 +1,17 @@
 from http.client import HTTPResponse
 from telnetlib import STATUS
 from django.shortcuts import render, redirect
+from store.forms import SignUpForm
 from .models import *
 from django.http import JsonResponse
 import datetime
 import json
 from .utils import querying_data, guestOrder
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
+from django.contrib.auth import login, authenticate, logout
+from .forms import SignUpForm
+from django.contrib import messages
 
 
 def store(request):
@@ -14,6 +20,53 @@ def store(request):
     products = Product.objects.all()
     context = {"products": products, "cartItems": cartItems}
     return render(request, "store/store.html", context)
+
+
+def register(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            email = form.cleaned_data.get('email')
+            user = authenticate(username=username, password=raw_password)
+            messages.success(request, f'Your account has been created!')
+            login(request, user)
+            customer = Customer(user=user, name=username, email=email)
+            customer.save()
+            return redirect("store")
+    
+    else:
+        form = SignUpForm()
+    context = {'form': form}
+    return render(request, 'store/register.html', context)
+
+
+def login_request(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=raw_password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'You have been logged in!')
+                return redirect("store")
+            else:
+                messages.error(request,"Invalid username or password.")
+        else:
+            messages.error(request,"Invalid username or password.")    
+    form = AuthenticationForm()
+    context = {'form': form}
+    return render(request, 'store/login.html', context)
+
+
+def logout_request(request):
+    logout(request)
+    messages.info(request, "You have successfully logged out.") 
+    return redirect("store")
 
 
 def cart(request):

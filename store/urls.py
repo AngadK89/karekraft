@@ -10,5 +10,8 @@ urlpatterns = [
     path("post_process/", views.postProcess, name='post_process'),
     path('register/', views.register, name='register'),
     path('login/', views.login_request, name='login'),
-    path('logout/', views.logout_request, name='logout')
+    path('logout/', views.logout_request, name='logout'),
+    path('view-profile/', views.view_profile, name='view-profile'),
+    path('edit-profile/', views.edit_profile, name='edit-profile'),
+    path('change-password/', views.ChangePasswordView.as_view(), name='change-password'),
 ]

@@ -10,8 +10,12 @@ from .utils import querying_data, guestOrder
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
-from .forms import SignUpForm
+from .forms import SignUpForm, UpdateUserForm
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
 
 
 def store(request):
@@ -68,6 +72,46 @@ def logout_request(request):
     messages.info(request, "You have successfully logged out.") 
     return redirect("store")
 
+@login_required
+def view_profile(request):
+    customer = request.user.customer
+    try:
+        orders = Order.objects.filter(customer=customer, complete=True)
+        # shipping_details = ShippingAddress.objects.get(id=orders.shipping_address)
+
+    except Order.DoesNotExist:
+        orders = None
+        # shipping_details = None
+    context = {'customer': customer, 'order': orders}
+    return render(request, 'store/view-profile.html', context)
+
+
+@login_required
+def edit_profile(request):
+    customer = request.user.customer
+    if request.method == 'POST':
+        user_form = UpdateUserForm(request.POST, instance=request.user)
+
+        if user_form.is_valid():
+            user_form.save()
+            username = user_form.cleaned_data.get('username')
+            email = user_form.cleaned_data.get('email')
+            customer.name = username
+            customer.email = email
+            customer.save()
+            messages.success(request, 'Your profile is updated successfully')
+            return redirect("view-profile")
+        
+    else:
+        user_form = UpdateUserForm(instance=request.user)
+    context = {'user_form': user_form}
+    return render(request, 'store/edit-profile.html', context)
+
+
+class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
+    template_name = 'store/change-password.html'
+    success_message = "Successfully Changed Your Password"
+    success_url = reverse_lazy('store')
 
 def cart(request):
     cart_data = querying_data(request)

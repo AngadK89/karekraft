@@ -1,5 +1,7 @@
-# from django.contrib import admin
-# from .models import *
+from django.contrib import admin
+from .models import *
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 
 
 # class CustomerAdmin(admin.ModelAdmin):
@@ -81,4 +83,4 @@
 # admin.site.register(Product, ProductAdmin)
 # admin.site.register(Order, OrderAdmin)
 # # admin.site.register(OrderItem)
-# admin.site.register(ShippingAddress, ShippingAddressAdmin)
+=======

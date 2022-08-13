@@ -4,46 +4,61 @@
 
 {% block content %}
 
-<div class="row my-3 p-3">
-    <h1>Profile Page</h1>
-    <p>{{customer.name}}</p>
-    <p>{{customer.email}}</p>
-    <a href="{% url 'edit-profile' %}" class="btn btn-warning float-right">Edit Profile</a>
-</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="box-element">
+            <br>
+            <h3>Profile Page</h3>
+            <br>
 
-<div class="col-lg-6">
-    <div>
-        <!-- <a class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a> -->
-        
-        <hr>
-        <h4>Orders</h4>
-        <hr>
-        {% if order != None %}
-            <table>
+            <table class="table">
                 <tr>
-                    <th>Order ID</th>
-                    <th>Products</th>
-                    <th>Total</th>
-                    <th>Payment Method</th>
-                    <th>Paid</th>
-                    <th>Status</th>
-                    <th>Shipping Details</th>
+                    <th><h5>Name: {{customer.name}}</h5></th>
+                    <th><h5>Email: {{customer.email}}</h5></th>
+                    <th>
+                        <a style="float: right; margin: 5px" class="btn btn-success" href="{% url 'edit-profile' %}">Edit Profile</a>
+
+                    </th>
                 </tr>
-                {% for order in orders %}
-                    <tr>
-                        <td>{{order.id}}</td>
-                        <td>{{order.products}}</td>
-                        <td>Rs.{{order.get_cart_total}}</td>
-                        <td>{{order.payment_method}}</td>
-                        <td>{{order.paid}}</td>
-                        <td>{{order.status}}</td>
-                        <td>{{order.shipping_address__address}}</td>
-                    </tr>
             </table>
-            {% endfor %}
+        </div>
+        <br>
+        {% if full_order_details == None %}
+            <h5 class="text-center mt-5 mb-3">You have yet to place any orders!</h5>
+            <p class="text-center"><a href="{% url 'store' %}">Continue Shopping!</a></p>  
         {% else %}
-            <h1 class="float-center">You have yet to place any orders!</h1>
-            <a href="{% url 'store' %}" class="btn btn-warning float-center">Continue Shopping</a>
+            <div class="box-element">
+                <div class="cart-row">
+                    <div style="flex: 1"><strong>Order ID</strong></div>
+                    <div style="flex: 2"><strong>Date Ordered</strong></div>
+                    <div style="flex: 2"><strong>Products</strong></div>
+                    <div style="flex: 1"><strong>Total</strong></div>
+                    <div style="flex: 1"><strong>Payment Method</strong></div>
+                    <div style="flex: 1"><strong>Paid</strong></div>
+                    <div style="flex: 1"><strong>Status</strong></div>
+                    <div style="flex: 2"><strong>Shipping Details</strong></div>
+                </div>
+
+                {% for order, cart in full_order_details %}
+                    <div class="cart-row">
+                        <div style="flex: 1"><p>{{order.id}}</p></div>
+                        <div style="flex: 2"><p>{{order.date_ordered}}</p></div>
+                        <div style="flex: 2">
+                            {% for item in cart %}
+                                <p>{{item.product.name}}</p>
+                            {% endfor %}
+                        </div>
+                        <div style="flex: 1"><p>Rs.{{order.get_cart_total}}</p></div>
+                        <div style="flex: 1"><p>{{order.payment_method}}</p></div>
+                        <div style="flex: 1"><p>{{order.paid}}</p></div>
+                        <div style="flex: 1"><p>{{order.status}}</p></div>
+                        <div style="flex: 2"><p>{{order.shipping_address.address}}, 
+                            {{order.shipping_address.city}},
+                            {{order.shipping_address.state}},
+                            {{order.shipping_address.zipcode}}</p></div>
+                    </div> 
+                {% endfor %}     
+            </div>                      
         {% endif %}
     </div>
 </div>

@@ -77,12 +77,15 @@ def view_profile(request):
     customer = request.user.customer
     try:
         orders = Order.objects.filter(customer=customer, complete=True)
-        # shipping_details = ShippingAddress.objects.get(id=orders.shipping_address)
+        full_order_details = []
+        for order in orders:
+            cart = OrderItem.objects.filter(order_id=order.id)
+            full_order_details.append((order, cart))
 
     except Order.DoesNotExist:
-        orders = None
+        full_order_details = None
         # shipping_details = None
-    context = {'customer': customer, 'order': orders}
+    context = {'customer': customer, 'full_order_details': full_order_details}
     return render(request, 'store/view-profile.html', context)
 
 

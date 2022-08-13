@@ -10,8 +10,12 @@ from .utils import querying_data, guestOrder
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
-from .forms import SignUpForm
+from .forms import SignUpForm, UpdateUserForm
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
 
 
 def store(request):
@@ -68,6 +72,49 @@ def logout_request(request):
     messages.info(request, "You have successfully logged out.") 
     return redirect("store")
 
+@login_required
+def view_profile(request):
+    customer = request.user.customer
+    try:
+        orders = Order.objects.filter(customer=customer, complete=True)
+        full_order_details = []
+        for order in orders:
+            cart = OrderItem.objects.filter(order_id=order.id)
+            full_order_details.append((order, cart))
+
+    except Order.DoesNotExist:
+        full_order_details = None
+        # shipping_details = None
+    context = {'customer': customer, 'full_order_details': full_order_details}
+    return render(request, 'store/view-profile.html', context)
+
+
+@login_required
+def edit_profile(request):
+    customer = request.user.customer
+    if request.method == 'POST':
+        user_form = UpdateUserForm(request.POST, instance=request.user)
+
+        if user_form.is_valid():
+            user_form.save()
+            username = user_form.cleaned_data.get('username')
+            email = user_form.cleaned_data.get('email')
+            customer.name = username
+            customer.email = email
+            customer.save()
+            messages.success(request, 'Your profile is updated successfully')
+            return redirect("view-profile")
+        
+    else:
+        user_form = UpdateUserForm(instance=request.user)
+    context = {'user_form': user_form}
+    return render(request, 'store/edit-profile.html', context)
+
+
+class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
+    template_name = 'store/change-password.html'
+    success_message = "Successfully Changed Your Password"
+    success_url = reverse_lazy('store')
 
 def cart(request):
     cart_data = querying_data(request)
@@ -118,7 +165,6 @@ def updateItem(request):
 
 
 def processOrder(request):
-    transaction_id = datetime.datetime.now().timestamp()
     data = json.loads(request.body)
 
     if request.user.is_authenticated:
@@ -129,18 +175,17 @@ def processOrder(request):
         customer, order = guestOrder(request, data)
 
     total = int(data["form"]["total"])
-    order.transaction_id = transaction_id
 
-    order.save()
-
-    ShippingAddress.objects.create(
+    shipping_address = ShippingAddress(
         customer=customer,
-        order=order,
         address=data["shipping"]["address"],
         city=data["shipping"]["city"],
         state=data["shipping"]["state"],
         zipcode=data["shipping"]["zipcode"],
     )
+    shipping_address.save()
+    order.shipping_address = shipping_address
+    order.save()
 
     if not data['COD']:
         order.razorpayOrder(total*100)
@@ -167,4 +212,4 @@ def postProcess(request):
     order.complete = True
     order.save()
 
-    return JsonResponse("Payment Completed!", safe=False)
+    return JsonResponse("Your order has been placed!", safe=False)

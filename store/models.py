@@ -44,8 +44,23 @@ class Product(models.Model):
         return self.name
 
 
+class ShippingAddress(models.Model):
+    customer = models.ForeignKey(
+        Customer, on_delete=models.SET_NULL, blank=True, null=True
+    )
+    address = models.CharField(max_length=200, null=False)
+    city = models.CharField(max_length=200, null=False)
+    state = models.CharField(max_length=200, null=False)
+    zipcode = models.CharField(max_length=200, null=False)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.address
+
+
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, blank=True, null=True)
+    shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.SET_NULL, blank=False, null=True)
     products = models.ManyToManyField(Product, through="OrderItem")
     date_ordered = models.DateTimeField(auto_now_add=True)
     STATUS = [
@@ -60,7 +75,6 @@ class Order(models.Model):
         max_length=20, choices=STATUS, default="Received", null=True, blank=False
     )
     complete = models.BooleanField(default=False)
-    transaction_id = models.CharField(max_length=200, null=True)
     razorpay_order = models.JSONField(null=True)
 
     METHODS = [
@@ -116,18 +130,3 @@ class OrderItem(models.Model):
     def get_total(self):
         total = self.product.price * self.quantity
         return total
-
-
-class ShippingAddress(models.Model):
-    customer = models.ForeignKey(
-        Customer, on_delete=models.SET_NULL, blank=True, null=True
-    )
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
-    address = models.CharField(max_length=200, null=False)
-    city = models.CharField(max_length=200, null=False)
-    state = models.CharField(max_length=200, null=False)
-    zipcode = models.CharField(max_length=200, null=False)
-    date_added = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return self.address

@@ -4,36 +4,36 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
 
-# class CustomerAdmin(admin.ModelAdmin):
-#     fields = ("user", "name", "email")
-#     readonly_fields = ("user", "name", "email")
-#     list_display = ("user", "name", "email")
-#     search_fields = ["name", "email", "user__username"]
+class CustomerAdmin(admin.ModelAdmin):
+    fields = ("user", "name", "email")
+    readonly_fields = ("user", "name", "email")
+    list_display = ("user", "name", "email")
+    search_fields = ["name", "email", "user__username"]
 
 
-# class ProductAdmin(admin.ModelAdmin):
-#     fieldsets = [
-#         ("Product Details", {"fields": ["name", "desc", "category", "image"]}),
-#         (None, {"fields": ["price", "stock"]}),
-#     ]
+class ProductAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("Product Details", {"fields": ["name", "desc", "category", "image"]}),
+        (None, {"fields": ["price", "stock"]}),
+    ]
 
-#     list_display = ("name", "category", "stock")
-#     list_filter = ["category"]
-#     search_fields = ["name"]
-#     ordering = [
-#         "name",
-#     ]
+    list_display = ("name", "category", "stock")
+    list_filter = ["category"]
+    search_fields = ["name"]
+    ordering = [
+        "name",
+    ]
 
-# class ProductInlineAdmin(admin.TabularInline):
-#     model = Order.products.through
-#     extra = 0
-#     can_delete = False
+class ProductInlineAdmin(admin.TabularInline):
+    model = Order.products.through
+    extra = 0
+    can_delete = False
 
-#     def has_add_permission(self, request, obj):
-#         return False
+    def has_add_permission(self, request, obj):
+        return False
     
-#     def has_change_permission(self, request, obj):
-#         return False
+    def has_change_permission(self, request, obj):
+        return False
 
 
 # class ShippingAddressInlineAdmin(admin.TabularInline):
@@ -48,39 +48,38 @@ from django.contrib.auth.admin import UserAdmin
 #         return False
 
 
-# class OrderAdmin(admin.ModelAdmin):
-#     fieldsets = [
-#         ("Order Details", {'fields': ["customer", "transaction_id", "date_ordered", "status"]}),
-#         # ("Shipping Details", {'fields': ['shipping_address', ]}),
-#         ("Payment Details", {'fields': ['payment_method', 'paid']}),
-#     ]
-#     readonly_fields = ["customer", "transaction_id", "date_ordered", "payment_method", ]
-#     list_display = ["id", "date_ordered", "status", "paid"]
-#     list_filter = ["status", "paid", "payment_method"]
-#     ordering = ["-date_ordered"]
-#     inlines = (ProductInlineAdmin, ShippingAddressInlineAdmin)
+class OrderAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("Order Details", {'fields': ["customer", "date_ordered", "status"]}),
+        # ("Shipping Details", {'fields': ['shipping_address', ]}),
+        ("Payment Details", {'fields': ['payment_method', 'paid']}),
+    ]
+    readonly_fields = ["customer", "date_ordered", "payment_method", ]
+    list_display = ["id", "date_ordered", "status", "paid"]
+    list_filter = ["status", "paid", "payment_method"]
+    ordering = ["-date_ordered"]
+    inlines = (ProductInlineAdmin, )
 
 
-# class ShippingAddressAdmin(admin.ModelAdmin):
-#     fieldsets = [
-#         (None, {"fields": ("customer", "date_added")}),
-#         ("Shipping Details", {"fields": ("address", "city", "state", "zipcode")}),
-#     ]
+class ShippingAddressAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {"fields": ("customer", "date_added")}),
+        ("Shipping Details", {"fields": ("address", "city", "state", "zipcode")}),
+    ]
 
-#     readonly_fields = [
-#         "customer",
-#         "address",
-#         "city",
-#         "state",
-#         "zipcode",
-#         "date_added",
-#     ]
-#     list_display = ["address", "customer", "date_added"]
-#     search_fields = ["address", "city", "state", "zipcode", "customer__name"]
+    readonly_fields = [
+        "customer",
+        "address",
+        "city",
+        "state",
+        "zipcode",
+        "date_added",
+    ]
+    list_display = ["address", "customer", "date_added"]
+    search_fields = ["address", "city", "state", "zipcode", "customer__name"]
 
 
-# admin.site.register(Customer, CustomerAdmin)
-# admin.site.register(Product, ProductAdmin)
-# admin.site.register(Order, OrderAdmin)
-# # admin.site.register(OrderItem)
-=======
+admin.site.register(Customer, CustomerAdmin)
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Order, OrderAdmin)
+# admin.site.register(OrderItem)

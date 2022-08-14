@@ -70,8 +70,9 @@
         </button>
         
         <!--Search bar - need to encode on my own-->
-        <form class="form-inline ml-3 my-2 my-lg-0">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <form class="form-inline ml-3 my-2 my-lg-0" method="POST" action="{% url 'search-results' %}">
+          {% csrf_token %}
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="searched">
           <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Search</button>
         </form>
 

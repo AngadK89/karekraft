@@ -26,6 +26,16 @@ def store(request):
     return render(request, "store/store.html", context)
 
 
+def search_results(request):
+    if request.method == "POST":
+        searched = request.POST["searched"]
+        products = Product.objects.filter(name__icontains=searched)
+        cart_data = querying_data(request)
+        cartItems = cart_data["cartItems"]
+        context = {"products": products, "cartItems": cartItems}
+        return render(request, 'store/search-results.html', context)
+
+
 def register(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -115,6 +125,7 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     template_name = 'store/change-password.html'
     success_message = "Successfully Changed Your Password"
     success_url = reverse_lazy('store')
+
 
 def cart(request):
     cart_data = querying_data(request)

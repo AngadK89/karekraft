@@ -31,7 +31,7 @@ class ProductInlineAdmin(admin.TabularInline):
 
     def has_add_permission(self, request, obj):
         return False
-    
+
     def has_change_permission(self, request, obj):
         return False
 
@@ -43,7 +43,7 @@ class ProductInlineAdmin(admin.TabularInline):
 
 #     def has_add_permission(self, request, obj):
 #         return False
-    
+
 #     def has_change_permission(self, request, obj):
 #         return False
 
@@ -51,11 +51,11 @@ class ProductInlineAdmin(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     fieldsets = [
         ("Order Details", {'fields': ["customer", "date_ordered", "status"]}),
-        # ("Shipping Details", {'fields': ['shipping_address', ]}),
+        ("Shipping Details", {'fields': ['shipping_address', ]}),
         ("Payment Details", {'fields': ['payment_method', 'paid']}),
     ]
-    readonly_fields = ["customer", "date_ordered", "payment_method", ]
-    list_display = ["id", "date_ordered", "status", "paid"]
+    readonly_fields = ["customer", "date_ordered", "payment_method", "shipping_address", ]
+    list_display = ["id", "date_ordered", "status", "paid", ]
     list_filter = ["status", "paid", "payment_method"]
     ordering = ["-date_ordered"]
     inlines = (ProductInlineAdmin, )

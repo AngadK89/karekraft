@@ -55,7 +55,7 @@ class ShippingAddress(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return self.address
+        return "{address}, {city}, {state}, {zipcode}".format(address=self.address, city=self.city, state=self.state, zipcode=self.zipcode)
 
 
 class Order(models.Model):

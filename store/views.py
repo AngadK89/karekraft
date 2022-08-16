@@ -219,8 +219,16 @@ def postProcess(request):
         order = Order.objects.get(customer=request.user.customer, complete=False)
         order.payment_method = 'COD'
         order.paid = False
-
+    
     order.complete = True
     order.save()
+
+    items = order.orderitem_set.all()
+    for item in items:
+        product = item.product
+        product.stock -= item.quantity
+        if product.stock < 0:
+            product.stock = 0 
+        product.save()
 
     return JsonResponse("Your order has been placed!", safe=False)

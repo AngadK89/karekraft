@@ -62,7 +62,7 @@ class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, blank=True, null=True)
     shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.SET_NULL, blank=False, null=True)
     products = models.ManyToManyField(Product, through="OrderItem")
-    date_ordered = models.DateTimeField(auto_now_add=True)
+    date_ordered = models.DateTimeField(blank=False, null=True)
     STATUS = [
         ("Received", "Received"),
         ("Dispatched", "Dispatched"),
@@ -71,9 +71,7 @@ class Order(models.Model):
         ("Returned", "Returned"),
         ("Cancelled", "Cancelled"),
     ]
-    status = models.CharField(
-        max_length=20, choices=STATUS, default="Received", null=True, blank=False
-    )
+    status = models.CharField(max_length=20, choices=STATUS, default="Received", null=True, blank=False)
     complete = models.BooleanField(default=False)
     razorpay_order = models.JSONField(null=True)
 

@@ -50,7 +50,7 @@ class ProductInlineAdmin(admin.TabularInline):
 
 class OrderAdmin(admin.ModelAdmin):
     fieldsets = [
-        ("Order Details", {'fields': ["customer", "date_ordered", "status"]}),
+        ("Order Details", {'fields': ["customer", "date_ordered", "status", ]}),
         ("Shipping Details", {'fields': ['shipping_address', ]}),
         ("Payment Details", {'fields': ['payment_method', 'paid']}),
     ]

@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
-
+import pytz
 
 def store(request):
     cart_data = querying_data(request)
@@ -219,7 +219,7 @@ def postProcess(request):
         order = Order.objects.get(customer=request.user.customer, complete=False)
         order.payment_method = 'COD'
         order.paid = False
-    
+    order.date_ordered = datetime.datetime.now(pytz.timezone('Asia/Calcutta'))
     order.complete = True
     order.save()
 

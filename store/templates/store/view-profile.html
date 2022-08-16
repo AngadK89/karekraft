@@ -32,6 +32,7 @@
                     <div style="flex: 1"><strong>Order ID</strong></div>
                     <div style="flex: 2"><strong>Date Ordered</strong></div>
                     <div style="flex: 2"><strong>Products</strong></div>
+                    <div style="flex: 1"><strong>Quantity</strong></div>
                     <div style="flex: 1"><strong>Total</strong></div>
                     <div style="flex: 1"><strong>Payment Method</strong></div>
                     <div style="flex: 1"><strong>Paid</strong></div>
@@ -46,6 +47,11 @@
                         <div style="flex: 2">
                             {% for item in cart %}
                                 <p>{{item.product.name}}</p>
+                            {% endfor %}
+                        </div>
+                        <div style="flex: 1">
+                            {% for item in cart %}
+                                <p>{{item.quantity}}</p>
                             {% endfor %}
                         </div>
                         <div style="flex: 1"><p>Rs.{{order.get_cart_total}}</p></div>

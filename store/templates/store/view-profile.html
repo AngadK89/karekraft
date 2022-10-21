@@ -35,7 +35,6 @@
                     <div style="flex: 1"><strong>Quantity</strong></div>
                     <div style="flex: 1"><strong>Total</strong></div>
                     <div style="flex: 1"><strong>Payment Method</strong></div>
-                    <div style="flex: 1"><strong>Paid</strong></div>
                     <div style="flex: 1"><strong>Status</strong></div>
                     <div style="flex: 2"><strong>Shipping Details</strong></div>
                 </div>
@@ -56,7 +55,6 @@
                         </div>
                         <div style="flex: 1"><p>Rs.{{order.get_cart_total}}</p></div>
                         <div style="flex: 1"><p>{{order.payment_method}}</p></div>
-                        <div style="flex: 1"><p>{{order.paid}}</p></div>
                         <div style="flex: 1"><p>{{order.status}}</p></div>
                         <div style="flex: 2"><p>{{order.shipping_address.address}}, 
                             {{order.shipping_address.city}},

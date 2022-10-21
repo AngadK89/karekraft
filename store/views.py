@@ -19,14 +19,20 @@ from django.contrib.messages.views import SuccessMessageMixin
 import pytz
 
 def store(request):
-    cart_data = querying_data(request)
-    cartItems = cart_data["cartItems"]
+    if request.user.is_authenticated:
+        cart_data = querying_data(request)
+        cartItems = cart_data["cartItems"]
+    else:
+        cartItems = 0
     products = Product.objects.all()
     context = {"products": products, "cartItems": cartItems}
     return render(request, "store/store.html", context)
 
 
 def search_results(request):
+    if not request.user.is_authenticated:
+        return register(request)
+    
     if request.method == "POST":
         searched = request.POST["searched"]
         products = Product.objects.filter(name__icontains=searched)
@@ -128,6 +134,9 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
 
 
 def cart(request):
+    if not request.user.is_authenticated:
+        return register(request)
+    
     cart_data = querying_data(request)
     items, order, cartItems = (
         cart_data["items"],

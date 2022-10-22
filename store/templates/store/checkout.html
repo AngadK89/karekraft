@@ -79,6 +79,16 @@
     csrftoken = form.getElementsByTagName("input")[0].value
     console.log('Newtoken: ', csrftoken)
 
+    form.addEventListener('change', function(event) {
+        console.log(event.target.form)
+        let shippinginfo = document.getElementById("shipping-info");
+        if (event.target.form.shipping_address.value !== "new") {
+            shippinginfo.style.display = "none";
+        } else {
+            shippinginfo.style.display = "";
+        }
+    });
+
     form.addEventListener("submit", function(e){
         e.preventDefault()
         console.log('Form submitted.')
@@ -137,12 +147,14 @@
         }
 
         console.log(form)
-        if (form.shipping_address !== "new") {
-            var shippingInfo = {'id': form.shipping_address}
+        var shippingInfo = {}
+
+        if (form.shipping_address.value !== "new") {
+            shippingInfo = {'id': form.shipping_address.value}
         }
 
         else {
-            var shippingInfo = {
+            shippingInfo = {
             'address': form.address.value,
             'city': form.city.value,
             'state': form.state.value, 

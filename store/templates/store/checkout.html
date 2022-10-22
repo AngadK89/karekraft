@@ -8,7 +8,13 @@
                 <hr>
                 <form id="form">
                     {% csrf_token %}
-
+                    <label for="shipping_address">Select shipping address</label>
+                    <select name="shipping_address">
+                        <option value="new" selected>Add new</option>
+                        {% for address in shippingAddresses %}
+                            <option value="{{address.id}}">{{address}}</option>
+                        {% endfor %}
+                    </select>
                     <div id="shipping-info">
 						<p>Shipping Information:</p>
 						<div class="form-field">
@@ -118,8 +124,6 @@
             alert(data)
             window.location.href = "{% url 'store' %}"
         })
-
-
     }
 
 
@@ -132,11 +136,18 @@
             'total': total, 
         }
 
-        var shippingInfo = {
+        console.log(form)
+        if (form.shipping_address !== "new") {
+            var shippingInfo = {'id': form.shipping_address}
+        }
+
+        else {
+            var shippingInfo = {
             'address': form.address.value,
             'city': form.city.value,
             'state': form.state.value, 
             'zipcode': form.zipcode.value,
+        }
         }
 
         var url = '/process_order/'

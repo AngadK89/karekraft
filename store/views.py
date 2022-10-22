@@ -150,7 +150,9 @@ def checkout(request):
         cart_data["order"],
         cart_data["cartItems"],
     )
-    context = {"items": items, "order": order, "cartItems": cartItems}
+    customer = request.user.customer
+    shippingAddresses = ShippingAddress.objects.filter(customer=customer)
+    context = {"items": items, "order": order, "cartItems": cartItems, "shippingAddresses": shippingAddresses}
     return render(request, "store/checkout.html", context)
 
 
@@ -186,15 +188,22 @@ def processOrder(request):
     customer = request.user.customer
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
     total = int(data["form"]["total"])
+    print(data)
+    shipping_address = None 
 
-    shipping_address = ShippingAddress(
-        customer=customer,
-        address=data["shipping"]["address"],
-        city=data["shipping"]["city"],
-        state=data["shipping"]["state"],
-        zipcode=data["shipping"]["zipcode"],
-    )
-    shipping_address.save()
+    if data["shipping"]["id"]:
+        shipping_address = ShippingAddress.objects.get(id=data["shipping"]["id"])
+
+    else:
+        shipping_address = ShippingAddress(
+            customer=customer,
+            address=data["shipping"]["address"],
+            city=data["shipping"]["city"],
+            state=data["shipping"]["state"],
+            zipcode=data["shipping"]["zipcode"],
+        )
+        shipping_address.save()
+
     order.shipping_address = shipping_address
     order.save()
 

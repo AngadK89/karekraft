@@ -30,9 +30,6 @@ def store(request):
 
 
 def search_results(request):
-    if not request.user.is_authenticated:
-        return register(request)
-    
     if request.method == "POST":
         searched = request.POST["searched"]
         products = Product.objects.filter(name__icontains=searched)
@@ -133,10 +130,8 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     success_url = reverse_lazy('store')
 
 
+@login_required
 def cart(request):
-    if not request.user.is_authenticated:
-        return register(request)
-    
     cart_data = querying_data(request)
     items, order, cartItems = (
         cart_data["items"],
@@ -147,6 +142,7 @@ def cart(request):
     return render(request, "store/cart.html", context)
 
 
+@login_required
 def checkout(request):
     cart_data = querying_data(request)
     items, order, cartItems = (

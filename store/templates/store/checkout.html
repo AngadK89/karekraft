@@ -8,17 +8,6 @@
                 <hr>
                 <form id="form">
                     {% csrf_token %}
-                    <div id="user-info">
-                        <p>Customer Information:</p>
-                        <hr>
-                        <div class="form-field">
-							<input required class="form-control" type="text" name="name" placeholder="Name..">
-						</div>
-						<div class="form-field">
-							<input required class="form-control" type="email" name="email" placeholder="Email..">
-						</div>
-                        <hr>
-                    </div>
 
                     <div id="shipping-info">
 						<p>Shipping Information:</p>
@@ -78,11 +67,6 @@
 
 <script type="text/javascript">
     var total = '{{order.get_cart_total}}'
-
-    if (user != 'AnonymousUser'){
-        document.getElementById('user-info').innerHTML = ''
-    }
-
 
     var form = document.getElementById('form')
 
@@ -153,11 +137,6 @@
             'city': form.city.value,
             'state': form.state.value, 
             'zipcode': form.zipcode.value,
-        }
-
-        if (user == 'AnonymousUser'){
-            userFormData.name = form.name.value
-            userFormData.email = form.email.value
         }
 
         var url = '/process_order/'

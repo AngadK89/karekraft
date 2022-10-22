@@ -6,7 +6,7 @@ from .models import *
 from django.http import JsonResponse
 import datetime
 import json
-from .utils import querying_data, guestOrder
+from .utils import querying_data
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
@@ -186,14 +186,9 @@ def updateItem(request):
 
 def processOrder(request):
     data = json.loads(request.body)
-
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-
-    else:
-        customer, order = guestOrder(request, data)
-
+   
+    customer = request.user.customer
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
     total = int(data["form"]["total"])
 
     shipping_address = ShippingAddress(

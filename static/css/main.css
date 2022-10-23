@@ -112,3 +112,17 @@ h1,h2,h3,h4,h5,h6{
 #div_id_password {
 	margin-top: 15px;
 }
+
+.navbar-custom {
+    background-color: #344530;
+}
+
+.btn {
+	color: #344530;
+	border-color: #344530;
+}
+
+.btn:hover {
+	background-color: #344530;
+	color: #fffef2;
+}

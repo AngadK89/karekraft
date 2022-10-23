@@ -6,43 +6,45 @@
             <div class="box-element" id="form-wrapper">
                 <h4>Checkout</h4>
                 <hr>
-                <form id="form">
-                    {% csrf_token %}
-                    <label for="shipping_address">Select shipping address</label>
-                    <select name="shipping_address">
-                        <option value="new" selected>Add new</option>
-                        {% for address in shippingAddresses %}
-                            <option value="{{address.id}}">{{address}}</option>
-                        {% endfor %}
-                    </select>
-                    <div id="shipping-info">
-						<p>Shipping Information:</p>
-						<div class="form-field">
-							<input class="form-control" type="text" name="address" placeholder="Address..">
-						</div>
-						<div class="form-field">
-							<input class="form-control" type="text" name="city" placeholder="City..">
-						</div>
-						<div class="form-field">
-							<input class="form-control" type="text" name="state" placeholder="State..">
-						</div>
-						<div class="form-field">
-							<input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
-						</div>
-                    </div>
+                {% if order.get_cart_items > 0 %}
+                    <form id="form">
+                        {% csrf_token %}
+                        <label for="shipping_address">Select shipping address</label>
+                        <select name="shipping_address">
+                            <option value="new" selected>Add new</option>
+                            {% for address in shippingAddresses %}
+                                <option value="{{address.id}}">{{address}}</option>
+                            {% endfor %}
+                        </select>
+                        <div id="shipping-info">
+                            <p>Shipping Information:</p>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="address" placeholder="Address..">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="city" placeholder="City..">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="state" placeholder="State..">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
+                            </div>
+                        </div>
 
-                    <hr>
-                    <input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
-                </form>
-
-
+                        <hr>
+                        <input id="form-button" class="btn btn-block" type="submit" value="Continue">
+                    </form>
+                {% else %}
+                    <p class="text-center">Add some items to your cart before checking out! Visit our <a href="/store">Store</a>!</p>
+                {% endif %}
             </div>
 
             <br>
             <div class="box-element hidden" id="payment-info">
                 <h4>Payment Options</h4>
-                <button id="razorpay" >Razorpay</button> 
-                <button id="cod">Cash on Delivery</button> 
+                <button class="btn" id="razorpay" >Razorpay</button> 
+                <button class="btn" id="cod">Cash on Delivery</button> 
                 <hr>
             </div>
         </div>

@@ -107,7 +107,6 @@ def edit_profile(request):
     customer = request.user.customer
     if request.method == 'POST':
         user_form = UpdateUserForm(request.POST, instance=request.user)
-
         if user_form.is_valid():
             user_form.save()
             username = user_form.cleaned_data.get('username')

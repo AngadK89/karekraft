@@ -82,4 +82,5 @@ class ShippingAddressAdmin(admin.ModelAdmin):
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Order, OrderAdmin)
+admin.site.register(ShippingAddress, ShippingAddressAdmin)
 # admin.site.register(OrderItem)

@@ -195,7 +195,6 @@
                     console.log('Success: ', data);
                 },
             };
-
             var rzp1 = new Razorpay(options);
             rzp1.on('payment.failed', function(response) {
                 alert(response.error.description);
@@ -207,7 +206,6 @@
             else {
                 postProcess(COD);
             }
-         
         })
     }
 </script>

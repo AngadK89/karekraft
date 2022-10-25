@@ -190,10 +190,10 @@ def processOrder(request):
     print(data)
     shipping_address = None 
 
-    if data["shipping"]["id"]:
+    try:
         shipping_address = ShippingAddress.objects.get(id=data["shipping"]["id"])
 
-    else:
+    except KeyError:
         shipping_address = ShippingAddress(
             customer=customer,
             address=data["shipping"]["address"],

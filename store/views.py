@@ -33,8 +33,11 @@ def search_results(request):
     if request.method == "POST":
         searched = request.POST["searched"]
         products = Product.objects.filter(name__icontains=searched)
-        cart_data = querying_data(request)
-        cartItems = cart_data["cartItems"]
+        if request.user.is_authenticated:
+            cart_data = querying_data(request)
+            cartItems = cart_data["cartItems"]
+        else:
+            cartItems = 0
         context = {"products": products, "cartItems": cartItems}
         return render(request, 'store/search-results.html', context)
 

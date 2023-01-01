@@ -1,33 +1,106 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
-    <h2>Scrubs</h2>
-        <div class="row">
+    <h2 class="store-heading">Scrubs</h2>
+    <div class="row">
         {% for product in products %}
             {% if product.category == "Scrub" %}
-                <div class="col-lg-4">
-                    <img class="thumbnail" src={{product.ImageURL}}>
-                    <div class="box-element product">
-                        <h5><strong>{{product.name}}</strong></h5> 
-                        <p>{{product.desc}}</p>
+            <div class="col-lg-4">
+                <img class="thumbnail" src={{product.ImageURL}}>
+                <div class="box-element product">
+                    <h5><strong>{{product.name}}</strong></h5> 
+                    <p>{{product.desc}}</p>
 
-                        {% if product.stock != 0 %}
-                        <button data-product={{product.id}} data-action="add"
-                        class="btn btn-outline add-btn update-cart">Add to Cart</button>
-                        
-                        <h5 class="d-inline float-right mr-2">Rs. {{product.price}}</h5>
-                        {% else %}
-                        <h5 class="d-inline float-center">Out of Stock</h5>                
-                        {% endif %}
-                    </div>
+                    {% if product.stock != 0 %}
+                    <button data-product={{product.id}} data-action="add"
+                    class="btn btn-outline add-btn update-cart">Add to Cart</button>
+                    
+                    <h5 class="d-inline float-right mr-2">Rs. {{product.price}}</h5>
+                    {% else %}
+                    <h5 class="d-inline float-center">Out of Stock</h5>                
+                    {% endif %}
                 </div>
+            </div>
             {% endif %}
         {% endfor %}
+    </div>
 
-    <h2>Oil</h2>
-        <div class="row">
+    <h2 class="store-heading">Masks</h2>
+    <div class="row">
+        {% for product in products %}
+            {% if product.category == "Mask" %}
+            <div class="col-lg-4">
+                <img class="thumbnail" src={{product.ImageURL}}>
+                <div class="box-element product">
+                    <h5><strong>{{product.name}}</strong></h5> 
+                    <p>{{product.desc}}</p>
+
+                    {% if product.stock != 0 %}
+                    <button data-product={{product.id}} data-action="add"
+                    class="btn btn-outline add-btn update-cart">Add to Cart</button>
+                    
+                    <h5 class="d-inline float-right mr-2">Rs. {{product.price}}</h5>
+                    {% else %}
+                    <h5 class="d-inline float-center">Out of Stock</h5>                
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <h2 class="store-heading">Oils</h2>
+    <div class="row">
         {% for product in products %}
             {% if product.category == "Oil" %}
+            <div class="col-lg-4">
+                <img class="thumbnail" src={{product.ImageURL}}>
+                <div class="box-element product">
+                    <h5><strong>{{product.name}}</strong></h5> 
+                    <p>{{product.desc}}</p>
+
+                    {% if product.stock != 0 %}
+                    <button data-product={{product.id}} data-action="add"
+                    class="btn btn-outline add-btn update-cart">Add to Cart</button>
+                    
+                    <h5 class="d-inline float-right mr-2">Rs. {{product.price}}</h5>
+                    {% else %}
+                    <h5 class="d-inline float-center">Out of Stock</h5>                
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <h2 class="store-heading">Serum</h2>
+    <div class="row">
+        {% for product in products %}
+            {% if product.category == "Serum" %}
+            <div class="col-lg-4">
+                <img class="thumbnail" src={{product.ImageURL}}>
+                <div class="box-element product">
+                    <h5><strong>{{product.name}}</strong></h5> 
+                    <p>{{product.desc}}</p>
+
+                    {% if product.stock != 0 %}
+                    <button data-product={{product.id}} data-action="add"
+                    class="btn btn-outline add-btn update-cart">Add to Cart</button>
+                    
+                    <h5 class="d-inline float-right mr-2">Rs. {{product.price}}</h5>
+                    {% else %}
+                    <h5 class="d-inline float-center">Out of Stock</h5>                
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <h2 class="store-heading">Mist</h2>
+    <div class="row">
+        {% for product in products %}
+            {% if product.category == "Mist" %}
                 <div class="col-lg-4">
                     <img class="thumbnail" src={{product.ImageURL}}>
                     <div class="box-element product">
@@ -46,5 +119,5 @@
                 </div>
             {% endif %}
         {% endfor %}
-        </div>
+    </div>
 {% endblock content %}

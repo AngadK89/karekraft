@@ -83,8 +83,9 @@ class Order(models.Model):
     paid = models.BooleanField(default=False)
 
     def razorpayOrder(self, amount):
+        secret = "A3Qj0BehTIFJAgnoVquqQRee"
         client = razorpay.Client(
-            auth=("rzp_test_95n7g5IxLaQMGz", "A3Qj0BehTIFJAgnoVquqQRee")
+            auth=("rzp_test_95n7g5IxLaQMGz", secret)
         )
 
         DATA = {

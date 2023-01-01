@@ -16,16 +16,10 @@ class UpdateUserForm(forms.ModelForm):
     username = forms.CharField(max_length=100,
                                required=False,
                                widget=forms.TextInput(attrs={'class': 'form-control'}))
-   
-    first_name = forms.EmailField(required=False,
-                             widget=forms.TextInput(attrs={'class': 'form-control'}))
-    
-    last_name = forms.EmailField(required=False,
-                             widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     email = forms.EmailField(required=False,
                              widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email']
+        fields = ('username', 'email')

@@ -8,14 +8,15 @@
                 <img class="thumbnail" src={{product.ImageURL}}>
                 <div class="box-element product">
                     <h5><strong>{{product.name}}</strong></h5>
-                    <hr>
+                    <p>{{product.desc}}</p>
+                    
                     {% if product.stock != 0 %}
                     <button data-product={{product.id}} data-action="add" 
-                    class="btn btn-outline-success add-btn update-cart">Add to Cart</button>
+                    class="btn add-btn update-cart">Add to Cart</button>
                     
                     <h5 class="d-inline float-right">Rs. {{product.price}}</h5>
                     {% else %}
-                    <h5 class="d-inline float-right">Out of Stock</h5>                
+                    <h5 class="d-inline float-center">Out of Stock</h5>                
                     {% endif %}
                 </div>
             </div>

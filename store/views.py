@@ -6,7 +6,7 @@ from .models import *
 from django.http import JsonResponse
 import datetime
 import json
-from .utils import querying_data, guestOrder
+from .utils import querying_data
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
@@ -19,8 +19,11 @@ from django.contrib.messages.views import SuccessMessageMixin
 import pytz
 
 def store(request):
-    cart_data = querying_data(request)
-    cartItems = cart_data["cartItems"]
+    if request.user.is_authenticated:
+        cart_data = querying_data(request)
+        cartItems = cart_data["cartItems"]
+    else:
+        cartItems = 0
     products = Product.objects.all()
     context = {"products": products, "cartItems": cartItems}
     return render(request, "store/store.html", context)
@@ -30,8 +33,11 @@ def search_results(request):
     if request.method == "POST":
         searched = request.POST["searched"]
         products = Product.objects.filter(name__icontains=searched)
-        cart_data = querying_data(request)
-        cartItems = cart_data["cartItems"]
+        if request.user.is_authenticated:
+            cart_data = querying_data(request)
+            cartItems = cart_data["cartItems"]
+        else:
+            cartItems = 0
         context = {"products": products, "cartItems": cartItems}
         return render(request, 'store/search-results.html', context)
 
@@ -104,7 +110,6 @@ def edit_profile(request):
     customer = request.user.customer
     if request.method == 'POST':
         user_form = UpdateUserForm(request.POST, instance=request.user)
-
         if user_form.is_valid():
             user_form.save()
             username = user_form.cleaned_data.get('username')
@@ -127,6 +132,7 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     success_url = reverse_lazy('store')
 
 
+@login_required
 def cart(request):
     cart_data = querying_data(request)
     items, order, cartItems = (
@@ -138,6 +144,7 @@ def cart(request):
     return render(request, "store/cart.html", context)
 
 
+@login_required
 def checkout(request):
     cart_data = querying_data(request)
     items, order, cartItems = (
@@ -145,7 +152,9 @@ def checkout(request):
         cart_data["order"],
         cart_data["cartItems"],
     )
-    context = {"items": items, "order": order, "cartItems": cartItems}
+    customer = request.user.customer
+    shippingAddresses = ShippingAddress.objects.filter(customer=customer)
+    context = {"items": items, "order": order, "cartItems": cartItems, "shippingAddresses": shippingAddresses}
     return render(request, "store/checkout.html", context)
 
 
@@ -177,24 +186,26 @@ def updateItem(request):
 
 def processOrder(request):
     data = json.loads(request.body)
-
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-
-    else:
-        customer, order = guestOrder(request, data)
-
+   
+    customer = request.user.customer
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
     total = int(data["form"]["total"])
+    print(data)
+    shipping_address = None 
 
-    shipping_address = ShippingAddress(
-        customer=customer,
-        address=data["shipping"]["address"],
-        city=data["shipping"]["city"],
-        state=data["shipping"]["state"],
-        zipcode=data["shipping"]["zipcode"],
-    )
-    shipping_address.save()
+    try:
+        shipping_address = ShippingAddress.objects.get(id=data["shipping"]["id"])
+
+    except KeyError:
+        shipping_address = ShippingAddress(
+            customer=customer,
+            address=data["shipping"]["address"],
+            city=data["shipping"]["city"],
+            state=data["shipping"]["state"],
+            zipcode=data["shipping"]["zipcode"],
+        )
+        shipping_address.save()
+
     order.shipping_address = shipping_address
     order.save()
 

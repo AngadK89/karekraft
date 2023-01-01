@@ -6,48 +6,45 @@
             <div class="box-element" id="form-wrapper">
                 <h4>Checkout</h4>
                 <hr>
-                <form id="form">
-                    {% csrf_token %}
-                    <div id="user-info">
-                        <p>Customer Information:</p>
+                {% if order.get_cart_items > 0 %}
+                    <form id="form">
+                        {% csrf_token %}
+                        <label for="shipping_address">Select shipping address</label>
+                        <select name="shipping_address">
+                            <option value="new" selected>Add new</option>
+                            {% for address in shippingAddresses %}
+                                <option value="{{address.id}}">{{address}}</option>
+                            {% endfor %}
+                        </select>
+                        <div id="shipping-info">
+                            <p>Shipping Information:</p>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="address" placeholder="Address..">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="city" placeholder="City..">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="state" placeholder="State..">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
+                            </div>
+                        </div>
+
                         <hr>
-                        <div class="form-field">
-							<input required class="form-control" type="text" name="name" placeholder="Name..">
-						</div>
-						<div class="form-field">
-							<input required class="form-control" type="email" name="email" placeholder="Email..">
-						</div>
-                        <hr>
-                    </div>
-
-                    <div id="shipping-info">
-						<p>Shipping Information:</p>
-						<div class="form-field">
-							<input class="form-control" type="text" name="address" placeholder="Address..">
-						</div>
-						<div class="form-field">
-							<input class="form-control" type="text" name="city" placeholder="City..">
-						</div>
-						<div class="form-field">
-							<input class="form-control" type="text" name="state" placeholder="State..">
-						</div>
-						<div class="form-field">
-							<input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
-						</div>
-                    </div>
-
-                    <hr>
-                    <input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
-                </form>
-
-
+                        <input id="form-button" class="btn btn-block" type="submit" value="Continue">
+                    </form>
+                {% else %}
+                    <p class="text-center">Add some items to your cart before checking out! Visit our <a href="/store">Store</a>!</p>
+                {% endif %}
             </div>
 
             <br>
             <div class="box-element hidden" id="payment-info">
                 <h4>Payment Options</h4>
-                <button id="razorpay" >Razorpay</button> 
-                <button id="cod">Cash on Delivery</button> 
+                <button class="btn" id="razorpay" >Razorpay</button> 
+                <button class="btn" id="cod">Cash on Delivery</button> 
                 <hr>
             </div>
         </div>
@@ -79,15 +76,20 @@
 <script type="text/javascript">
     var total = '{{order.get_cart_total}}'
 
-    if (user != 'AnonymousUser'){
-        document.getElementById('user-info').innerHTML = ''
-    }
-
-
     var form = document.getElementById('form')
 
     csrftoken = form.getElementsByTagName("input")[0].value
     console.log('Newtoken: ', csrftoken)
+
+    form.addEventListener('change', function(event) {
+        console.log(event.target.form)
+        let shippinginfo = document.getElementById("shipping-info");
+        if (event.target.form.shipping_address.value !== "new") {
+            shippinginfo.style.display = "none";
+        } else {
+            shippinginfo.style.display = "";
+        }
+    });
 
     form.addEventListener("submit", function(e){
         e.preventDefault()
@@ -134,8 +136,6 @@
             alert(data)
             window.location.href = "{% url 'store' %}"
         })
-
-
     }
 
 
@@ -148,16 +148,20 @@
             'total': total, 
         }
 
-        var shippingInfo = {
+        console.log(form)
+        var shippingInfo = {}
+
+        if (form.shipping_address.value !== "new") {
+            shippingInfo = {'id': form.shipping_address.value}
+        }
+
+        else {
+            shippingInfo = {
             'address': form.address.value,
             'city': form.city.value,
             'state': form.state.value, 
             'zipcode': form.zipcode.value,
         }
-
-        if (user == 'AnonymousUser'){
-            userFormData.name = form.name.value
-            userFormData.email = form.email.value
         }
 
         var url = '/process_order/'
@@ -191,7 +195,6 @@
                     console.log('Success: ', data);
                 },
             };
-
             var rzp1 = new Razorpay(options);
             rzp1.on('payment.failed', function(response) {
                 alert(response.error.description);
@@ -203,7 +206,6 @@
             else {
                 postProcess(COD);
             }
-         
         })
     }
 </script>

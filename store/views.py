@@ -241,5 +241,5 @@ def postProcess(request):
         if product.stock < 0:
             product.stock = 0 
         product.save()
-
+    messages.success(request, "Your order has been placed!")
     return JsonResponse("Your order has been placed!", safe=False)

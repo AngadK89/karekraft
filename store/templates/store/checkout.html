@@ -189,10 +189,6 @@
                 "description": "KareKraft Checkout",
                 "order_id": data['razorpay_order']["order_id"],
                 "handler": function (response) {
-                    alert(response.razorpay_payment_id);
-                    alert(response.razorpay_order_id);
-                    alert(response.razorpay_signature);
-
                     postProcess(COD, response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
 
                     console.log('Success: ', data);

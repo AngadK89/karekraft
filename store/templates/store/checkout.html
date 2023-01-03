@@ -10,13 +10,16 @@
                     <form id="form">
                         {% csrf_token %}
                         <label for="shipping_address">Select shipping address</label>
-                        <select name="shipping_address">
+                        <br>
+                        <select name="shipping_address" class="address-bar">
                             <option value="new" selected>Add new</option>
                             {% for address in shippingAddresses %}
                                 <option value="{{address.id}}">{{address}}</option>
                             {% endfor %}
                         </select>
+
                         <div id="shipping-info">
+                            <br>
                             <p>Shipping Information:</p>
                             <div class="form-field">
                                 <input class="form-control" type="text" name="address" placeholder="Address..">
@@ -186,10 +189,6 @@
                 "description": "KareKraft Checkout",
                 "order_id": data['razorpay_order']["order_id"],
                 "handler": function (response) {
-                    alert(response.razorpay_payment_id);
-                    alert(response.razorpay_order_id);
-                    alert(response.razorpay_signature);
-
                     postProcess(COD, response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
 
                     console.log('Success: ', data);

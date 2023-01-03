@@ -221,7 +221,7 @@ def postProcess(request):
     data = json.loads(request.body)
 
     if not data['COD']:
-        order = Order.objects.get(razorpay_order__contains={'order_id': data['order_id']})
+        order = Order.objects.get(razorpay_order__icontains=data['order_id'])
         order.razorpay_order['payment_id'] = data['payment_id']
         order.razorpay_order['signature'] = data['signature']
         order.payment_method = 'Razorpay'
@@ -241,5 +241,5 @@ def postProcess(request):
         if product.stock < 0:
             product.stock = 0 
         product.save()
-
+    messages.success(request, "Your order has been placed!")
     return JsonResponse("Your order has been placed!", safe=False)

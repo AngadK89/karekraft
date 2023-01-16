@@ -13,6 +13,7 @@
                         <br>
                         <select name="shipping_address" class="address-bar">
                             <option value="new" selected>Add new</option>
+                            <!--Adds drop down of all saved shipping addresses-->
                             {% for address in shippingAddresses %}
                                 <option value="{{address.id}}">{{address}}</option>
                             {% endfor %}
@@ -39,6 +40,7 @@
                         <input id="form-button" class="btn btn-block" type="submit" value="Continue">
                     </form>
                 {% else %}
+                    <!--If no products in cart, customer redirected to homepage-->
                     <p class="text-center">Add some items to your cart before checking out! Visit our <a href="/store">Store</a>!</p>
                 {% endif %}
             </div>
@@ -84,16 +86,18 @@
     csrftoken = form.getElementsByTagName("input")[0].value
     console.log('Newtoken: ', csrftoken)
 
+    //Saves shipping address data basis option selected by customer
     form.addEventListener('change', function(event) {
         console.log(event.target.form)
         let shippinginfo = document.getElementById("shipping-info");
         if (event.target.form.shipping_address.value !== "new") {
-            shippinginfo.style.display = "none";
+            shippinginfo.style.display = "none";    //Hides shipping details form if saved address selected
         } else {
             shippinginfo.style.display = "";
         }
     });
 
+    //Reveals payment options once shipping address successfully selected & confirmed
     form.addEventListener("submit", function(e){
         e.preventDefault()
         console.log('Form submitted.')
@@ -104,7 +108,7 @@
 
     document.getElementById('razorpay').addEventListener('click', function(e){
         var COD = false;
-        submitFormData(COD)
+        submitFormData(COD) //COD flag used to manage payment processing
     })
 
     document.getElementById('cod').addEventListener('click', function(e){
@@ -113,9 +117,79 @@
     })
 
 
+    function submitFormData(COD){
+        console.log("Payment button clicked.")
+
+        var userFormData = {
+            'name': null,
+            'email': null,
+            'total': total, 
+        }
+
+        console.log(form)
+        var shippingInfo = {}
+
+        if (form.shipping_address.value !== "new") {
+            shippingInfo = {'id': form.shipping_address.value}  //Reads ID if saved address selected
+        }
+        else {
+            shippingInfo = {
+            'address': form.address.value,
+            'city': form.city.value,
+            'state': form.state.value, 
+            'zipcode': form.zipcode.value,
+        }
+        }
+
+        var url = '/process_order/'
+
+        //Fetch API invoked to send HTTP request to run process_order view
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', 
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({'form': userFormData, 'shipping': shippingInfo, 'COD': COD})
+        })
+        .then((response) => response.json())
+
+        .then((data) => {
+            //If Razorpay selected, HTTP response will include razorpay order data, 
+            //which will be used to send payment request to razorpay via Razorpay API
+
+            if (!COD) {
+                var options = {
+                "key": "rzp_test_95n7g5IxLaQMGz",
+                "amount": (total * 100).toString(),
+                "currency": "INR",
+                "name": "KareKraft",
+                "description": "KareKraft Checkout",
+                "order_id": data['razorpay_order']["order_id"],
+                "handler": function (response) {
+                    postProcess(COD, response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
+
+                    console.log('Success: ', data);
+                },
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function(response) {
+                alert(response.error.description);
+            });
+
+            rzp1.open();    //Allows user to keep re-attempting payment until it is successful & verified    
+            }
+            
+            else {
+                postProcess(COD);
+            }
+        })
+    }
+
     function postProcess(COD, payment_id=null, order_id=null, signature=null) {
         var url = '/post_process/'
 
+        //Fetch API sends HTTP request to post_process view with payment verification data such as payment ID & signature
         fetch(url, {
             method: 'POST',
             headers: {
@@ -137,75 +211,10 @@
         .then((data) => {
             document.cookie = 'cart=' + JSON.stringify({}) + ";domain=;path=/";
             alert(data)
-            window.location.href = "{% url 'store' %}"
+            window.location.href = "{% url 'store' %}"  
+            //After order is successfully placed (indicated by HTTP response), customer redirected to homepage
         })
     }
 
-
-    function submitFormData(COD){
-        console.log("Payment button clicked.")
-
-        var userFormData = {
-            'name': null,
-            'email': null,
-            'total': total, 
-        }
-
-        console.log(form)
-        var shippingInfo = {}
-
-        if (form.shipping_address.value !== "new") {
-            shippingInfo = {'id': form.shipping_address.value}
-        }
-
-        else {
-            shippingInfo = {
-            'address': form.address.value,
-            'city': form.city.value,
-            'state': form.state.value, 
-            'zipcode': form.zipcode.value,
-        }
-        }
-
-        var url = '/process_order/'
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json', 
-                'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({'form': userFormData, 'shipping': shippingInfo, 'COD': COD})
-        })
-        .then((response) => response.json())
-
-        .then((data) => {
-            if (!COD) {
-                var options = {
-                "key": "rzp_test_95n7g5IxLaQMGz",
-                "amount": (total * 100).toString(),
-                "currency": "INR",
-                "name": "KareKraft",
-                "description": "KareKraft Checkout",
-                "order_id": data['razorpay_order']["order_id"],
-                "handler": function (response) {
-                    postProcess(COD, response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
-
-                    console.log('Success: ', data);
-                },
-            };
-            var rzp1 = new Razorpay(options);
-            rzp1.on('payment.failed', function(response) {
-                alert(response.error.description);
-            });
-
-            rzp1.open();     
-            }
-            
-            else {
-                postProcess(COD);
-            }
-        })
-    }
 </script>
 {% endblock content %}

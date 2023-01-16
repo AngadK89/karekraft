@@ -43,7 +43,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         
-        <!--Search bar - need to encode on my own-->
+        <!--Search bar: Loads up search-results.html when product is searched for -->
         <form class="form-inline ml-3 my-2 my-lg-0" method="POST" action="{% url 'search-results' %}">
           {% csrf_token %}
           <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="searched">

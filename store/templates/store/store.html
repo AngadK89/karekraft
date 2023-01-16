@@ -4,9 +4,10 @@
     <h2 class="store-heading">Scrubs</h2>
     <div class="row">
         {% for product in products %}
-            {% if product.category == "Scrub" %}
+            {% if product.category == "Scrub" %}    <!--Used to segregate products basis category-->
             <div class="col-lg-4">
                 <img class="thumbnail" src={{product.ImageURL}}>
+                <!-- Product boxes -->
                 <div class="store-box-element product">
                     <h5 class="store-text"><strong>{{product.name}}</strong></h5> 
                     <p class="store-text">{{product.desc}}</p>

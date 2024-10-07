@@ -1,1 +1,1 @@
-Read Me
+E-commerce website developed for the start-up brand KareKraft. It was created using standard HTML, CSS, and Tailwind for the frontend, and Django with SQLite for the backend. This brand is currently non-operational, and the website is this not hosted on a public domain. 
